@@ -54,7 +54,7 @@ def fit(model, dataset, criterion=F.nll_loss,
             output = model(X.to(device))
 
             # criterion: batch-average loss
-            loss = criterion(output, y.to(device), reduction="mean")
+            loss = criterion(output, y.to(device))  # , reduction="mean")
 
             # get gradients with backward pass
             optim.zero_grad()
