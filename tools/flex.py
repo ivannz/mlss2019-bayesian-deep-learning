@@ -86,4 +86,5 @@ def plot(ax, images, *, n_col=None, n_row=None, format="chw", **kwargs):
     n_row, n_col = get_dimensions(n_samples, height, width, n_row, n_col)
     ax = setup_canvas(ax, height, width, n_row, n_col)
 
-    return ax.imshow(arrange(n_row, n_col, images), **kwargs, origin="upper")
+    image = arrange(n_row, n_col, images)
+    return ax.imshow(image.squeeze(), **kwargs, origin="upper")
