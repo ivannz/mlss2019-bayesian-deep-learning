@@ -7,7 +7,7 @@ from torch.utils.data import TensorDataset, DataLoader
 
 
 def dataset_from_numpy(*ndarrays, dtype=None, device=None):
-    """Creates :class:`TensorDataset` from the passed :class:`numpy.ndarray`-s.
+    """Create :class:`TensorDataset` from the passed :class:`numpy.ndarray`-s.
 
     Each returned tensor in the TensorDataset and :attr:`ndarray` share
     the same memory, unless a type cast or device transfer took place.
@@ -25,9 +25,18 @@ def dataset_from_numpy(*ndarrays, dtype=None, device=None):
     return TensorDataset(*[t.to(device, dtype) for t in tensors])
 
 
-def fit(model, dataset, batch_size=32, n_epochs=1,
-        loss_fn=F.nll_loss, verbose=False):
-    """Fit the model with SGD on the specified dataset."""
+def fit(model, dataset, criterion=F.nll_loss,
+        batch_size=32, n_epochs=1, verbose=False):
+    """Fit the model with SGD (Adam) on the specified dataset.
+    
+    This bare minimum of a fit loop creates a minibatch generator from
+    the `dataset` with batches of size `batch_size`. On each batch it
+    computes the backward pass through the `criterion` and the `model`
+    and updates the `model`-s parameters with the Adam optimizer step.
+    The loop passes through the dataset `n_epochs` times. It does not
+    output any running debugging information, except for a progress bar.
+    """
+
     # get the model's device
     device = next(model.parameters()).device
 
@@ -45,7 +54,7 @@ def fit(model, dataset, batch_size=32, n_epochs=1,
             output = model(X.to(device))
 
             # criterion: batch-average loss
-            loss = loss_fn(output, y.to(device), reduction="mean")
+            loss = criterion(output, y.to(device), reduction="mean")
 
             # get gradients with backward pass
             optim.zero_grad()
@@ -57,20 +66,24 @@ def fit(model, dataset, batch_size=32, n_epochs=1,
     return model
 
 
-def apply(model, dataset):
-    """Collect model's outputs on the dataset without autograd."""
+def apply(model, dataset, batch_size=512):
+    """Collect model's outputs on the dataset.
+
+    This straightforward function switches the model into `evaluation`
+    regime, computes the forward pass on the `dataset` (in batches of
+    size `batch_size`) and stacks the results into a `cpu` tensor. It
+    temporarily disables `autograd` to gain some speed-up.
+    """
     model.eval()
 
     # get the model's device
     device = next(model.parameters()).device
 
     # batch generator for the evaluation loop
-    feed = DataLoader(dataset, batch_size=512, shuffle=False)
+    feed = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-    # disable gradients (huge speed up!)
+    # compute and collect the outputs
     with torch.no_grad():
-
-        # compute and collect the outputs
         return torch.cat([
             model(X.to(device)).cpu() for X, *rest in feed
         ], dim=0)
