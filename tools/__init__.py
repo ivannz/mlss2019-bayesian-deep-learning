@@ -25,17 +25,29 @@ def dataset_from_numpy(*ndarrays, dtype=None, device=None):
     return TensorDataset(*[t.to(device, dtype) for t in tensors])
 
 
-def fit(model, dataset, criterion=F.nll_loss,
-        batch_size=32, n_epochs=1, verbose=False):
-    """Fit the model with SGD (Adam) on the specified dataset.
-    
+default_criteria = {
+    "nll": lambda model, X, y: F.nll_loss(model(X), y, reduction="mean"),
+    "mse": lambda model, X, y: 0.5 * F.mse_loss(model(X), y, reduction="mean"),
+}
+
+
+def fit(model, dataset, criterion="nll", batch_size=32,
+        n_epochs=1, verbose=False):
+    """Fit the model with SGD (Adam) on the specified dataset and criterion.
+
     This bare minimum of a fit loop creates a minibatch generator from
     the `dataset` with batches of size `batch_size`. On each batch it
     computes the backward pass through the `criterion` and the `model`
     and updates the `model`-s parameters with the Adam optimizer step.
     The loop passes through the dataset `n_epochs` times. It does not
     output any running debugging information, except for a progress bar.
+
+    The criterion can be either "mse" for mean sqaured error, "nll" for
+    negative loglikelihood (categorical), or a callable taking `model, X, y`
+    as arguments.
     """
+    criterion = default_criteria.get(criterion, criterion)
+    assert callable(criterion)
 
     # get the model's device
     device = next(model.parameters()).device
@@ -50,11 +62,8 @@ def fit(model, dataset, criterion=F.nll_loss,
 
         model.train()
         for X, y in feed:
-            # forward pass
-            output = model(X.to(device))
-
-            # criterion: batch-average loss
-            loss = criterion(output, y.to(device))  # , reduction="mean")
+            # forward pass through the criterion (batch-average loss)
+            loss = criterion(model, X.to(device), y.to(device))
 
             # get gradients with backward pass
             optim.zero_grad()
