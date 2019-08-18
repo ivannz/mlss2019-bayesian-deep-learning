@@ -6,7 +6,7 @@ import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 
 
-def dataset_from_numpy(*ndarrays, dtype=None, device=None):
+def dataset_from_numpy(*ndarrays, device=None, dtype=torch.float32):
     """Create :class:`TensorDataset` from the passed :class:`numpy.ndarray`-s.
 
     Each returned tensor in the TensorDataset and :attr:`ndarray` share
@@ -32,7 +32,7 @@ default_criteria = {
 
 
 def fit(model, dataset, criterion="nll", batch_size=32,
-        n_epochs=1, verbose=False):
+        n_epochs=1, weight_decay=0, verbose=False):
     """Fit the model with SGD (Adam) on the specified dataset and criterion.
 
     This bare minimum of a fit loop creates a minibatch generator from
@@ -53,7 +53,8 @@ def fit(model, dataset, criterion="nll", batch_size=32,
     device = next(model.parameters()).device
 
     # an optimizer for model's parameters
-    optim = torch.optim.Adam(model.parameters(), lr=1e-3)  # , weight_decay=1e-5)
+    optim = torch.optim.Adam(model.parameters(), lr=2e-3,
+                             weight_decay=weight_decay)
 
     # stochastic minibatch generator for the training loop
     feed = DataLoader(dataset, shuffle=True,
