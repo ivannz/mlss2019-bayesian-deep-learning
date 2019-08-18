@@ -1,6 +1,18 @@
 import matplotlib.pyplot as plt
 
 
+def darker(color, a=0.5):
+    """Adapted from this stackoverflow question_.
+
+    .. _question: https://stackoverflow.com/questions/37765197/
+    """
+    from matplotlib.colors import to_rgb
+    from colorsys import rgb_to_hls, hls_to_rgb
+
+    h, l, s = rgb_to_hls(*to_rgb(color))
+    return hls_to_rgb(h, max(0, min(a * l, 1)), s)
+
+
 def canvas1d(*, figsize=(12, 5)):
     """Setup canvas for 1d function plot."""
     fig, ax = plt.subplots(1, 1, figsize=figsize)
