@@ -57,11 +57,11 @@ def fit(model, dataset, criterion="nll", batch_size=32,
                              weight_decay=weight_decay)
 
     # stochastic minibatch generator for the training loop
-    feed = DataLoader(dataset, shuffle=True,
-                                       batch_size=batch_size)
+    feed = DataLoader(dataset, shuffle=True, batch_size=batch_size)
     for epoch in tqdm.tqdm(range(n_epochs), disable=not verbose):
 
         model.train()
+
         for X, y in feed:
             # forward pass through the criterion (batch-average loss)
             loss = criterion(model, X.to(device), y.to(device))
@@ -81,8 +81,8 @@ def apply(model, dataset, batch_size=512):
 
     This straightforward function switches the model into `evaluation`
     regime, computes the forward pass on the `dataset` (in batches of
-    size `batch_size`) and stacks the results into a `cpu` tensor. It
-    temporarily disables `autograd` to gain some speed-up.
+    size `batch_size`) and stacks the results into a tensor on the `cpu`.
+    It temporarily disables `autograd` to gain some speed-up.
     """
     model.eval()
 
