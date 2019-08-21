@@ -15,14 +15,14 @@ ImageDataset = namedtuple("ImageDataset", ["data", "targets", "classes"])
 
 def get_mnist(path="./data", train=True):
     dataset = datasets.MNIST(path, train=train, download=True)
-    return ImageDataset((dataset.data.float() - 33.3285) / 78.5655,
+    return ImageDataset((dataset.data.float().unsqueeze(1) - 33.3285) / 78.5655,
                         dataset.targets,
                         dataset.classes)
 
 
 def get_kmnist(path="./data", train=True):
     dataset = datasets.KMNIST(path, train=train, download=True)
-    return ImageDataset(dataset.data.float() / 255.,
+    return ImageDataset(dataset.data.float().unsqueeze(1) / 255.,
                         dataset.targets,
                         dataset.classes)
 
