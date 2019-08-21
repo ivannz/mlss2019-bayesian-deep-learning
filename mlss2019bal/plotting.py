@@ -18,7 +18,8 @@ def canvas1d(*, figsize=(12, 5)):
     fig, ax = plt.subplots(1, 1, figsize=figsize)
 
     fig.patch.set_alpha(1.0)
-    ax.set_xlim(-7, +7) ; ax.set_ylim(-7, +9)
+    ax.set_xlim(-7, +7)
+    ax.set_ylim(-7, +9)
 
     return fig, ax
 
@@ -39,7 +40,8 @@ def plot1d(X, y, bands, ax=None, **kwargs):
     else:
         for band in sorted(bands):
             ax.fill_between(X, y_mean + band * y_std, y_mean - band * y_std,
-                            color=color, alpha=0.4 / len(bands), zorder=zorder - 1)
+                            color=color, zorder=zorder-1,
+                            alpha=0.4 / len(bands))
 
     return line
 
