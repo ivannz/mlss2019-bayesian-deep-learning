@@ -32,7 +32,7 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
         dataset, holdout = get_mnist(path, train=True), get_mnist(path, train=False)
 
     elif name == "KMNIST":
-        dataset, holdout = get_mnist(path, train=True), get_mnist(path, train=False)
+        dataset, holdout = get_kmnist(path, train=True), get_kmnist(path, train=False)
 
     n_classes = len(dataset.classes)
     random_state = check_random_state(random_state)
