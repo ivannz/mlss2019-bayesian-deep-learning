@@ -37,7 +37,9 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
     n_classes = len(dataset.classes)
     random_state = check_random_state(random_state)
 
-    # get indices for each subsample
+    distribution = random_state.dirichlet([0.1] * n_classes)
+
+    # create an imbalanced class label distribution for the train
     targets = dataset.targets.numpy()
 
     # split the dataset into validaton and everything else
@@ -45,9 +47,8 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
         np.arange(len(targets)), stratify=targets, test_size=n_valid,
         shuffle=True, random_state=random_state)
 
-    # create an imbalanced class label distribution for the train
+    # get indices for each subsample
     indices = []
-    distribution = random_state.dirichlet([0.1] * n_classes)
     for label, freq in enumerate(np.round(distribution * n_train)):
         ix = np.flatnonzero(targets[ix_rest] == label)
         indices.extend(ix[:int(freq)])
