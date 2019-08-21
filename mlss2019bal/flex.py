@@ -63,7 +63,7 @@ def to_hwc(images, format):
     assert format in ("chw", "hwc"), f"Unrecognized format `{format}`."
 
     if images.ndim == 3:
-        return images[:, np.newaxis]
+        return images[..., np.newaxis]
 
     assert images.ndim == 4, f"Images must be Nx{'x'.join(format.upper())}."
 
