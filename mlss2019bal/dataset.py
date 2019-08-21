@@ -55,11 +55,12 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
     ix_train, ix_pool = np.take(ix_rest, indices), np.delete(ix_rest, indices)
 
     # collect and split into datasets
-    dataset = TensorDataset(dataset.data, dataset.targets)
-    holdout = TensorDataset(holdout.data, holdout.targets)
 
-    S_train, S_pool = dataset[ix_train], dataset[ix_pool]
-    S_valid, S_test = dataset[ix_valid], holdout
+    S_train = TensorDataset(dataset.data[ix_train], dataset.targets[ix_train])
+    S_valid = TensorDataset(dataset.data[ix_valid], dataset.targets[ix_valid])
+    S_pool = TensorDataset(dataset.data[ix_pool], dataset.targets[ix_pool])
+    S_test = TensorDataset(holdout.data, holdout.targets)
+
     return S_train, S_pool, S_valid, S_test
 
 
