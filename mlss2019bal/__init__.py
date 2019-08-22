@@ -46,6 +46,9 @@ def fit(model, dataset, criterion="nll", batch_size=32,
     negative loglikelihood (categorical), or a callable taking `model, X, y`
     as arguments.
     """
+    if len(dataset) <= 0 or batch_size <= 0:
+        return model
+
     criterion = default_criteria.get(criterion, criterion)
     assert callable(criterion)
 
