@@ -82,6 +82,8 @@ def plot(ax, images, *, n_col=None, n_row=None, format="chw", **kwargs):
     images = to_hwc(images, format)
 
     n_samples, height, width, *color = images.shape
+    if n_samples < 1:
+        return None
 
     n_row, n_col = get_dimensions(n_samples, height, width, n_row, n_col)
     ax = setup_canvas(ax, height, width, n_row, n_col)
