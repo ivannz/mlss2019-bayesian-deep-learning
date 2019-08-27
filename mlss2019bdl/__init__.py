@@ -79,8 +79,8 @@ def fit(model, dataset, criterion="nll", batch_size=32,
     return model
 
 
-def apply(model, dataset, batch_size=512):
-    """Collect model's outputs on the dataset.
+def predict(model, dataset, batch_size=512):
+    """Get model's output on the dataset.
 
     This straightforward function switches the model into `evaluation`
     regime, computes the forward pass on the `dataset` (in batches of
