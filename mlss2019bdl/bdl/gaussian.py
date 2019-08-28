@@ -42,8 +42,7 @@ class BaseGaussianConv2d(Conv2d, PenalizedWeight, FreezableWeight):
     """Convolutional layer with Gaussian Mean Field weight distribution."""
 
     def __init__(self, in_channels, out_channels, kernel_size, stride=1,
-                 padding=0, dilation=1, groups=1, bias=True, p=0.05,
-                 padding_mode='zeros'):
+                 padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros'):
         super().__init__(in_channels, out_channels, kernel_size, stride=stride,
                          padding=padding, dilation=dilation, groups=groups,
                          bias=bias, padding_mode=padding_mode)
