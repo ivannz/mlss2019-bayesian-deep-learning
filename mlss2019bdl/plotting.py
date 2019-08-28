@@ -1,3 +1,4 @@
+import torch
 import matplotlib.pyplot as plt
 
 
@@ -24,8 +25,17 @@ def canvas1d(*, figsize=(12, 5)):
     return fig, ax
 
 
+def to_numpy(tensor):
+    if isinstance(tensor, Tensor):
+        tensor = tensor.data.cpu().numpy()
+
+    return np.asarray(tensor).squeeze()
+
+
 def plot1d(X, y, bands, ax=None, **kwargs):
+    X, y = to_numpy(X), to_numpy(y)
     assert y.ndim == 2 and X.ndim == 1
+
     ax = plt.gca() if ax is None else ax
 
     # plot the predictive mean with the specified colour
@@ -47,7 +57,8 @@ def plot1d(X, y, bands, ax=None, **kwargs):
 
 
 def plot1d_bands(X, y, ax=None, **kwargs):
-    return plot1d(X, y, bands=(0.5, 1.0, 1.5, 2.0), ax=ax, **kwargs)
+    # return plot1d(X, y, bands=(0.5, 1.0, 1.5, 2.0), ax=ax, **kwargs)
+    return plot1d(X, y, bands=(1.96,), ax=ax, **kwargs)
 
 
 def plot1d_paths(X, y, ax=None, **kwargs):
