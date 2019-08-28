@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from torch import Tensor
+from numpy import asarray
 
 
 def darker(color, a=0.5):
@@ -30,7 +31,7 @@ def to_numpy(tensor):
     if isinstance(tensor, Tensor):
         tensor = tensor.data.cpu().numpy()
 
-    return np.asarray(tensor).squeeze()
+    return asarray(tensor).squeeze()
 
 
 def plot1d(X, y, bands, ax=None, **kwargs):
