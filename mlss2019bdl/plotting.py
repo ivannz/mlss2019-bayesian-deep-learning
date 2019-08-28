@@ -1,5 +1,6 @@
-import torch
 import matplotlib.pyplot as plt
+
+from torch import Tensor
 
 
 def darker(color, a=0.5):
