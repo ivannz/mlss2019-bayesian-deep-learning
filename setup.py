@@ -9,6 +9,7 @@ setup(
     author_email="ivan.nazarov@skolkovotech.ru",
     packages=[
         "mlss2019bdl",
+        "mlss2019bdl.bdl",
     ],
     install_requires=[
         "numpy",
