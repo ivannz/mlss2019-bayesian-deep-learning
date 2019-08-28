@@ -1,7 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from torch.nn import Linear
+from torch.nn import Linear, Conv2d
 
 from .base import FreezableWeight, PenalizedWeight
 
