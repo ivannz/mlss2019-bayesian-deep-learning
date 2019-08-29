@@ -7,60 +7,47 @@ from torchvision import datasets
 from sklearn.utils import check_random_state
 from sklearn.model_selection import train_test_split
 
-from collections import namedtuple
 
-
-ImageDataset = namedtuple("ImageDataset", ["data", "targets", "classes"])
-
-
-def get_mnist(path="./data", train=True):
-    dataset = datasets.MNIST(path, train=train, download=True)
-    return ImageDataset((dataset.data.float().unsqueeze(1) - 33.3285) / 78.5655,
-                        dataset.targets,
-                        dataset.classes)
-
-
-def get_kmnist(path="./data", train=True):
-    dataset = datasets.KMNIST(path, train=train, download=True)
-    return ImageDataset(dataset.data.float().unsqueeze(1) / 255.,
-                        dataset.targets,
-                        dataset.classes)
-
-
-def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path="./data"):
+def get_data(name, path="./data", train=True):
     if name == "MNIST":
-        dataset, holdout = get_mnist(path, train=True), get_mnist(path, train=False)
-
+        dataset = datasets.MNIST(path, train=train, download=True)
     elif name == "KMNIST":
-        dataset, holdout = get_kmnist(path, train=True), get_kmnist(path, train=False)
+        dataset = datasets.KMNIST(path, train=train, download=True)
 
-    n_classes = len(dataset.classes)
+    images = dataset.data.float().unsqueeze(1)
+    return TensorDataset(images / 255., dataset.targets)
+
+
+def get_dataset(n_train=20, n_valid=5000, n_pool=5000,
+                name="MNIST", path="./data", random_state=None):
     random_state = check_random_state(random_state)
 
-    distribution = random_state.dirichlet([0.1] * n_classes)
+    dataset = get_data(name, path, train=True)
+    S_test = get_data(name, path, train=False)
 
     # create an imbalanced class label distribution for the train
-    targets = dataset.targets.numpy()
+    targets = dataset.tensors[-1].cpu().numpy()
 
-    # split the dataset into validaton and everything else
-    ix_rest, ix_valid = train_test_split(
-        np.arange(len(targets)), stratify=targets, test_size=n_valid,
-        shuffle=True, random_state=random_state)
+    # split the dataset into validaton and train
+    ix_all = np.r_[:len(targets)]
+    ix_train, ix_valid = train_test_split(
+        ix_all, stratify=targets, shuffle=True,
+        train_size=max(n_train, 1), test_size=max(n_valid, 1),
+        random_state=random_state)
 
-    # get indices for each subsample
-    indices = []
-    for label, freq in enumerate(np.round(distribution * n_train)):
-        ix = np.flatnonzero(targets[ix_rest] == label)
-        indices.extend(ix[:int(freq)])
+    if n_train < 1:
+        ix_train = np.r_[:0]
 
-    ix_train, ix_pool = np.take(ix_rest, indices), np.delete(ix_rest, indices)
+    if n_valid < 1:
+        ix_valid = np.r_[:0]
 
-    # collect and split into datasets
+    ix_pool = np.delete(ix_all, np.r_[ix_train, ix_valid])
+    if n_pool > 0:
+        ix_pool = random_state.permutation(ix_pool)[:n_pool]
 
-    S_train = TensorDataset(dataset.data[ix_train], dataset.targets[ix_train])
-    S_valid = TensorDataset(dataset.data[ix_valid], dataset.targets[ix_valid])
-    S_pool = TensorDataset(dataset.data[ix_pool], dataset.targets[ix_pool])
-    S_test = TensorDataset(holdout.data, holdout.targets)
+    S_train = TensorDataset(*dataset[ix_train])
+    S_valid = TensorDataset(*dataset[ix_valid])
+    S_pool = TensorDataset(*dataset[ix_pool])
 
     return S_train, S_pool, S_valid, S_test
 
