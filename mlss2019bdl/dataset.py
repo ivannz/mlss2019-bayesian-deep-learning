@@ -81,7 +81,9 @@ def merge(*datasets, out=None):
     # Classes derived from Dataset support appending via
     #  `+` (__add__), but this breaks slicing.
 
-    data = [d.tensors for d in datasets if d is not None]
+    data = [d.tensors for d in datasets if d is not None and d.tensors]
+    assert all(len(data[0]) == len(d) for d in data)
+
     tensors = [torch.cat(tup, dim=0) for tup in zip(*data)]
 
     if isinstance(out, TensorDataset):
