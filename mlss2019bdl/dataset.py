@@ -65,32 +65,23 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
     return S_train, S_pool, S_valid, S_test
 
 
-def take(pool, indices):
-    """Copy the specified samples from the pool."""
-    # a binary mask of selected samples (duplicated indices)
-    mask = torch.zeros(len(pool), dtype=torch.bool)
+def remove(indices, dataset):
+    """Extract the specified samples from the dataset and remove."""
+    mask = torch.zeros(len(dataset), dtype=torch.uint8)
     mask[indices] = True
 
-    return TensorDataset(*pool[mask])
+    removed = TensorDataset(*dataset[mask])
+
+    dataset.tensors = dataset[~mask]
+
+    return removed
 
 
-def delete(pool, indices):
-    """Drop the specified samples from the pool."""
-
-    # mask out the selected samples
-    mask = torch.ones(len(pool), dtype=torch.bool)
-    mask[indices] = False
-
-    return TensorDataset(*pool[mask])
-
-
-def append(train, new):
-    """Append new samples to the train dataset."""
-    tensors = [
-        torch.cat(pair, dim=0)
-        for pair in zip(train.tensors, new.tensors)
-    ]
-
+def merge(*datasets):
     # Classes derived from Dataset support appending via
     #  `+` (__add__), but this breaks slicing.
+
+    data = [d.tensors for d in datasets]
+    tensors = [torch.cat(tup, dim=0) for tup in zip(*data)]
+
     return TensorDataset(*tensors)
