@@ -77,11 +77,15 @@ def remove(indices, dataset):
     return removed
 
 
-def merge(*datasets):
+def merge(*datasets, out=None):
     # Classes derived from Dataset support appending via
     #  `+` (__add__), but this breaks slicing.
 
     data = [d.tensors for d in datasets if d is not None]
     tensors = [torch.cat(tup, dim=0) for tup in zip(*data)]
+
+    if isinstance(out, TensorDataset):
+        out.tensors = tensors
+        return out
 
     return TensorDataset(*tensors)
