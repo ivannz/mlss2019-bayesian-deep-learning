@@ -26,12 +26,14 @@ def dataset_from_numpy(*ndarrays, device=None, dtype=torch.float32):
 
 
 default_criteria = {
-    "nll": lambda model, X, y: F.nll_loss(model(X), y, reduction="mean"),
-    "mse": lambda model, X, y: 0.5 * F.mse_loss(model(X), y, reduction="mean"),
+    "cross_entropy":
+        lambda model, X, y: F.cross_entropy(model(X), y, reduction="mean"),
+    "mse":
+        lambda model, X, y: 0.5 * F.mse_loss(model(X), y, reduction="mean"),
 }
 
 
-def fit(model, dataset, criterion="nll", batch_size=32,
+def fit(model, dataset, criterion="mse", batch_size=32,
         n_epochs=1, weight_decay=0, verbose=False):
     """Fit the model with SGD (Adam) on the specified dataset and criterion.
 
