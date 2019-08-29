@@ -65,18 +65,18 @@ def get_dataset(n_train=20, n_valid=5000, random_state=None, name="MNIST", path=
     return S_train, S_pool, S_valid, S_test
 
 
-def remove(indices, dataset):
-    """Extract the specified samples from the dataset and remove."""
+def collect(indices, dataset):
+    """Collect the specified samples from the dataset and remove."""
     assert len(dataset) > 0
 
     mask = torch.zeros(len(dataset), dtype=torch.uint8)
     mask[indices] = True
 
-    removed = TensorDataset(*dataset[mask])
+    collected = TensorDataset(*dataset[mask])
 
     dataset.tensors = dataset[~mask]
 
-    return removed
+    return collected
 
 
 def merge(*datasets, out=None):
