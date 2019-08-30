@@ -1,6 +1,7 @@
 import torch
 
 from torch.nn import Module
+from inspect import signature
 
 
 class FreezableWeight(Module):
@@ -36,12 +37,36 @@ def unfreeze(module):
     return module  # return self
 
 
+def check_defaults(fn):
+    arguments = [p for p in signature(fn).parameters.values()
+                 if p.name != "self" and p.kind != p.VAR_KEYWORD]
+
+    missing = [p.name for p in arguments if p.default is p.empty]
+    if missing:
+        fn_name = getattr(fn, "__qualname__", fn.__name__)
+        raise TypeError(f"`{fn_name}`: no default(s) for `{missing}`.")
+
+
 class PenalizedWeight(Module):
+    def __init_subclass__(cls, **kwargs):
+        # enforce defaults on explicit parameters of `.penalty`
+        check_defaults(cls.penalty)
+        super().__init_subclass__(**kwargs)
+
     def penalty(self):
         raise NotImplementedError()
 
 
-def penalties(module):
-    for mod in module.modules():
+def named_penalties(module, hyperparameters=None, prefix=""):
+    if hyperparameters is None:
+        hyperparameters = {}
+
+    for name, mod in module.named_modules(prefix=prefix):
         if isinstance(mod, PenalizedWeight):
-            yield mod.penalty()
+            par = hyperparameters.get(name, {})
+            yield name, mod.penalty(**par)
+
+
+def penalties(module):
+    for name, penalty in named_penalties(module):
+        yield penalty
