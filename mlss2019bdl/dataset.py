@@ -35,18 +35,36 @@ def get_dataset(n_train=20, n_valid=5000, n_pool=5000,
         train_size=max(n_train, 1), test_size=max(n_valid, 1),
         random_state=random_state)
 
+    # prepare the datasets: pool, train and validation
     if n_train < 1:
         ix_train = np.r_[:0]
+    S_train = TensorDataset(*dataset[ix_train])
 
     if n_valid < 1:
         ix_valid = np.r_[:0]
+    S_valid = TensorDataset(*dataset[ix_valid])
 
+    # prepare the pool
     ix_pool = np.delete(ix_all, np.r_[ix_train, ix_valid])
+
+    # we want to have lots of boring/useless examples in the pool
+    labels, share = (1, 2, 3, 4, 5, 6, 7, 8, 9), 0.95
+    pool_targets, dropped = targets[ix_pool], []
+
+    # deplete the pool of each class
+    for label in labels:
+        ix_cls = np.flatnonzero(pool_targets == label)
+        n_kept = int(share * len(ix_cls))
+
+        # pick examples at random to drop
+        ix_cls = random_state.permutation(ix_cls)
+        dropped.append(ix_cls[:n_kept])
+
+    ix_pool = np.delete(ix_pool, np.concatenate(dropped))
+
+    # select at most `n_pool` examples
     if n_pool > 0:
         ix_pool = random_state.permutation(ix_pool)[:n_pool]
-
-    S_train = TensorDataset(*dataset[ix_train])
-    S_valid = TensorDataset(*dataset[ix_valid])
     S_pool = TensorDataset(*dataset[ix_pool])
 
     return S_train, S_pool, S_valid, S_test
