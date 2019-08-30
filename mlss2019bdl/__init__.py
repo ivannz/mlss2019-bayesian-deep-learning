@@ -26,12 +26,14 @@ def dataset_from_numpy(*ndarrays, device=None, dtype=torch.float32):
 
 
 default_criteria = {
-    "nll": lambda model, X, y: F.nll_loss(model(X), y, reduction="mean"),
-    "mse": lambda model, X, y: 0.5 * F.mse_loss(model(X), y, reduction="mean"),
+    "cross_entropy":
+        lambda model, X, y: F.cross_entropy(model(X), y, reduction="mean"),
+    "mse":
+        lambda model, X, y: 0.5 * F.mse_loss(model(X), y, reduction="mean"),
 }
 
 
-def fit(model, dataset, criterion="nll", batch_size=32,
+def fit(model, dataset, criterion="mse", batch_size=32,
         n_epochs=1, weight_decay=0, verbose=False):
     """Fit the model with SGD (Adam) on the specified dataset and criterion.
 
@@ -79,8 +81,8 @@ def fit(model, dataset, criterion="nll", batch_size=32,
     return model
 
 
-def apply(model, dataset, batch_size=512):
-    """Collect model's outputs on the dataset.
+def predict(model, dataset, batch_size=512):
+    """Get model's output on the dataset.
 
     This straightforward function switches the model into `evaluation`
     regime, computes the forward pass on the `dataset` (in batches of
