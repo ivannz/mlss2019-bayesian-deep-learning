@@ -1,4 +1,4 @@
-# MLSS2019: Bayesian Active Learning
+# MLSS2019: Bayesian Deep Learning
 
 ## Installation: colab
 
@@ -23,9 +23,9 @@ When all prerequisites have been met, please, clone this repository and
 install it with:
 
 ```bash
-git clone https://github.com/ivannz/mlss2019-bayesian-active-learning.git
+git clone https://github.com/ivannz/mlss2019-bayesian-deep-learning.git
 
-cd mlss2019-bayesian-active-learning
+cd mlss2019-bayesian-deep-learning
 
 pip install --editable .
 ```
