@@ -31,5 +31,12 @@ cd mlss2019-bayesian-deep-learning
 pip install --editable .
 ```
 
-This will install the necessary service python code that will make the seminar
-much easier and your learning experience better.
+This will install the necessary service python code that will make the
+seminar much more concise and, hopefully, your learning experience better.
+
+
+## Versions
+
+The version presented at MLSS Moscow Aug 26 - Sep 5, 2019, can also be found
+in the [MLSS2019](https://github.com/mlss-skoltech/) repo. Here it sits under
+the tag `mlss2019-Aug-30`.
