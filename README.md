@@ -17,6 +17,7 @@ Please make sure that you have the following packages installed:
 * tqdm
 * numpy
 * torch >= 1.1
+
 The most convenient way to ensure this is use Anaconda with python 3.7.
 
 When all prerequisites have been met, please, clone this repository and
