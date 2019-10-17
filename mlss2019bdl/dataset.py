@@ -74,7 +74,7 @@ def collect(indices, dataset):
     """Collect the specified samples from the dataset and remove."""
     assert len(dataset) > 0
 
-    mask = torch.zeros(len(dataset), dtype=torch.uint8)
+    mask = torch.zeros(len(dataset), dtype=torch.bool)
     mask[indices] = True
 
     collected = TensorDataset(*dataset[mask])
