@@ -75,7 +75,7 @@ def collect(indices, dataset):
     assert len(dataset) > 0
 
     mask = torch.zeros(len(dataset), dtype=torch.bool)
-    mask[indices] = True
+    mask[indices.long()] = True
 
     collected = TensorDataset(*dataset[mask])
 
