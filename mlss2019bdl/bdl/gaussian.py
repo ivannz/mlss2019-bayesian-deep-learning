@@ -27,7 +27,8 @@ class BaseGaussianLinear(Linear, FreezableWeight, PenalizedWeight):
 
         s2 = F.linear(input * input, torch.exp(self.log_sigma2), None)
 
-        return torch.normal(super().forward(input), torch.sqrt(s2 + 1e-20))
+        mu = super().forward(input)
+        return mu + torch.randn_like(s2) * torch.sqrt(s2 + 1e-20)
 
     def freeze(self):
 
@@ -63,7 +64,8 @@ class BaseGaussianConv2d(Conv2d, PenalizedWeight, FreezableWeight):
         s2 = F.conv2d(input * input, torch.exp(self.log_sigma2), None,
                       self.stride, self.padding, self.dilation, self.groups)
 
-        return torch.normal(super().forward(input), torch.sqrt(s2 + 1e-20))
+        mu = super().forward(input)
+        return mu + torch.randn_like(s2) * torch.sqrt(s2 + 1e-20)
 
     freeze = BaseGaussianLinear.freeze
 
